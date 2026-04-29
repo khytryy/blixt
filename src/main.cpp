@@ -4,13 +4,18 @@
 #include <ftxui/component/screen_interactive.hpp>
 #include <ftxui/dom/elements.hpp>
 #include <iostream>
-#include <modes/modes.hpp>
+#include <parser/parser.hpp>
 
 int main() {
-    blixt::Mode      mode     = blixt::MODE_COMMAND;
+    blixt::Mode mode = blixt::MODE_COMMAND;
+
+    ftxui::App       app      = ftxui::ScreenInteractive::Fullscreen();
     ftxui::Component renderer = ftxui::Renderer([&mode] {
         return ftxui::vbox(
-                       {ftxui::vbox(
+                       {ftxui::text(blixt::inf) |
+                                ftxui::color(ftxui::Color::Green),
+                        ftxui::filler(),
+                        ftxui::vbox(
                                 {ftxui::text("Blixt") | ftxui::hcenter,
                                  ftxui::separatorEmpty(),
                                  ftxui::text(std::format("Version {}.{}.{}-{}",
@@ -38,16 +43,22 @@ int main() {
                         ftxui::separatorEmpty(),
                         ftxui::filler(),
 
-                        ftxui::hbox({
-                                blixt::printMode(mode),
-                                ftxui::filler(),
+                        ftxui::hbox(
+                                {blixt::printMode(mode),
+                                 ftxui::filler(),
+                                 ftxui::bold(ftxui::text(blixt::err) |
+                                             ftxui::color(ftxui::Color::Red))
 
-                        })}) |
+                                })}) |
                ftxui::borderEmpty | ftxui::flex;
     });
 
     ftxui::ComponentDecorator keyhandler =
             ftxui::CatchEvent([&](ftxui::Event e) {
+                if (e.character() == "!" && mode == blixt::MODE_COMMAND) {
+                    blixt::err = "Already in command mode";
+                    return false;
+                }
                 if (e.is_character()) {
                     blixt::input_text += e.character();
                     return true;
@@ -58,16 +69,16 @@ int main() {
                     return true;
                 }
                 if (e == ftxui::Event::Return) {
+                    blixt::parseCommand([&app]() { blixt::currentFile.close(); app.Exit(); });
                     blixt::input_text.clear();
                     return true;
                 }
                 if (e == ftxui::Event::Delete) {
                     blixt::input_text.clear();
-                    return true;  
+                    return true;
                 }
                 return false;
             });
-    ftxui::App app = ftxui::ScreenInteractive::Fullscreen();
     auto component = renderer | keyhandler;
 
     app.Loop(component);
