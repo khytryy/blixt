@@ -1,5 +1,5 @@
 CC      := g++
-CFLAGS  := -Wall -Wextra -g -O2 -I include -I external/ftxui/include -MMD -MP
+CFLAGS  := -std=c++20 -Wall -Wextra -g -O2 -I include -I external/ftxui/include -MMD -MP
 
 SRC_DIR := src
 OBJ_DIR := obj
