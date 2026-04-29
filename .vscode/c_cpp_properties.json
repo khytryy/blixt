@@ -7,7 +7,7 @@
                 "${workspaceFolder}/external/ftxui/include"
             ],
             "defines": [],
-            "compilerPath": "/usr/bin/g++",
+            "compilerPath": "/usr/bin/g++-13",
             "cppStandard": "c++20",
             "intelliSenseMode": "linux-gcc-x64"
         }
